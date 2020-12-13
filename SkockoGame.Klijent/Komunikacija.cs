@@ -3,8 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
+using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace SkockoGame.Klijent
@@ -12,7 +14,7 @@ namespace SkockoGame.Klijent
     public class Komunikacija
     {
         private static Komunikacija instance;
-        private Socket klijentskiSoket;
+        public Socket klijentskiSoket;
         private BinaryFormatter formatter = new BinaryFormatter();
         private NetworkStream tok;
         public FrmKlijent forma;
@@ -38,6 +40,21 @@ namespace SkockoGame.Klijent
                 {
 
                     Odgovor odgovor = (Odgovor)formatter.Deserialize(tok);
+                    Thread t = new Thread(Timer);
+                    if(odgovor.Poruka == "Vi ste na potezu")
+                    {
+                        //t.Start();
+                        forma.ButtonVisibleTrue();
+                        forma.LoginFalse();
+                        forma.ResetTxt();
+                    }
+                    if(odgovor.Poruka == "Protivnik je na potezu")
+                    {
+                        if (t.IsAlive) t.Abort();
+                        forma.ButtonVisibleFalse();
+                        forma.LoginFalse();
+                        forma.ResetTxt();
+                    }
                     switch (odgovor.Forma)
                     {
                         case (FormaPrikaz.Ja):
@@ -61,10 +78,18 @@ namespace SkockoGame.Klijent
                 catch (IOException)
                 {
 
-                    MessageBox.Show("Pukao je server!");
+                    MessageBox.Show("Pukao je server ili korisnik!");
                     klijentskiSoket.Close();
+                    Environment.Exit(0);
                     kraj = true;
 
+                }
+                catch (SerializationException)
+                {
+                    MessageBox.Show("Pukao je server ili korisnik!");
+                    klijentskiSoket.Close();
+                    Environment.Exit(0);
+                    kraj = true;
                 }
             }
         }
@@ -101,10 +126,34 @@ namespace SkockoGame.Klijent
             }
             catch (IOException)
             {
-                MessageBox.Show("Pukao je server!");
+                MessageBox.Show("Pukao je server ili protivnik!");
                 klijentskiSoket.Close();
+                Environment.Exit(0);
                 return null;
 
+            }
+        }
+
+        private void Timer()
+        {
+            try
+            {
+                for (int i = 30; i >= 0; i--)
+                {
+                    forma.DodajPorukuRezultat(i + "");
+                    Thread.Sleep(1000);
+                }
+                PosaljiPoruku("Isteklo je vreme");
+            }
+            catch (ThreadInterruptedException)
+            {
+                forma.DodajPorukuRezultat("");
+                return;
+            }
+            catch (ThreadAbortException)
+            {
+                forma.DodajPorukuRezultat("");
+                return;
             }
         }
     }

@@ -135,5 +135,41 @@ namespace SkockoGame.Klijent
             if (txt is null) return;
             Komunikacija.Instance.PosaljiPoruku(txt.Text);
         }
+        public void ResetTxt()
+        {
+            txtPrva.Text = "";
+            txtDruga.Text = "";
+            txtTreca.Text = "";
+            txtCetvrta.Text = "";
+            txtPeta.Text = "";
+        }
+        public void ButtonVisibleFalse()
+        {
+            btnHerc.Visible = false;
+            btnKaro.Visible = false;
+            btnTref.Visible = false;
+            btnZvezda.Visible = false;
+            btnSkocko.Visible = false;
+            btnPik.Visible = false;
+        }
+        public void ButtonVisibleTrue()
+        {
+            btnHerc.Visible = true;
+            btnKaro.Visible = true;
+            btnTref.Visible = true;
+            btnZvezda.Visible = true;
+            btnSkocko.Visible = true;
+            btnPik.Visible = true;
+        }
+        public void LoginFalse()
+        {
+            btnIme.Visible = false;
+            txtIme.Visible = false;
+        }
+
+        private void FrmKlijent_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Komunikacija.Instance.klijentskiSoket.Close();
+        }
     }
 }

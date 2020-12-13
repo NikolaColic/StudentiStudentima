@@ -274,6 +274,7 @@ namespace SkockoGame.Klijent
             this.Controls.Add(this.btnZvezda);
             this.Name = "FrmKlijent";
             this.Text = "FrmKlijent";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.FrmKlijent_FormClosed);
             this.Load += new System.EventHandler(this.FrmKlijent_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

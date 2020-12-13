@@ -40,5 +40,16 @@ namespace SkockoGame.Server
                 MessageBox.Show("Neuspesno!");
             }
         }
+
+        private void Form1_Leave(object sender, EventArgs e)
+        {
+            Server.Instance.ZaustaviServer();
+        }
+
+        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Server.Instance.ZaustaviServer();
+
+        }
     }
 }

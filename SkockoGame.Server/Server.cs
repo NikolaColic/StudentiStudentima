@@ -16,6 +16,7 @@ namespace SkockoGame.Server
         //Ovo se dodaje tek kada se dodaje za ime
         List<Socket> listaSoketa = new List<Socket>();
         BinaryFormatter formatter = new BinaryFormatter();
+        List<Igrac> listaIgraca = new List<Igrac>();
         
         private static Server instance;
         private Server()
@@ -95,8 +96,18 @@ namespace SkockoGame.Server
                 NetworkStream tok = new NetworkStream(socket);
                 Zahtev zahtev = (Zahtev)formatter.Deserialize(tok);
                 Igrac igrac = new Igrac() { Soket = socket, Username = zahtev.Pokusaj };
-                Obrada obrada = new Obrada(igrac);
-                obrada.KlijentObrada();
+                listaIgraca.Add(igrac);
+                if (listaIgraca.Count % 2 == 0)
+                {
+
+                    Obrada obrada = new Obrada(listaIgraca[0], listaIgraca[1]);
+                    listaIgraca.Clear();
+                    new Thread(obrada.KlijentObrada).Start();
+
+                }else
+                {
+                    formatter.Serialize(tok, new Odgovor() { Poruka = "Trazimo protivnike", Forma = FormaPrikaz.Ja });
+                }
             }
             catch (SocketException)
             {
